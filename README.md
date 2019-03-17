@@ -3,12 +3,8 @@ This project uses the encoder to convert any file to a compressed .huf file. The
 
 ### Instructions to run:
 0.  you need to change the filepath to point to stdc++.h file on line 7 of both .cpp files
-### Ecoder:
+### Encode / Decode:
 ```sh
 1.  ./henc filename
-```
-
-### Decoder
-```sh
 2.  ./hdec filename.huf
 ```
