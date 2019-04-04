@@ -1,46 +1,95 @@
-#include <stdio.h>
 #include "heap.h"
+
+#include <stdio.h>
+#include <limits.h>
+#include <stdlib.h>
+#include <math.h>
+#include <string.h>
+
+
+struct huff_node{
+     char word[50];
+     struct huff_node *left, *right;
+};
+
+struct huff_node *huff_root = NULL;
+struct huff_node *original = NULL;
+char code[50];
+
+
+void Init_huff(){
+
+    huff_root = malloc(sizeof(struct huff_node));
+
+
+    char nonterminal[50] = "!NONTERMINAL!";
+    strcpy(huff_root->word,nonterminal);
+
+    original = huff_root;
+
+}
+
+
+
+void insert_huff(char insertword[50], int freq){
+
+    char nonterminal[50] = "!NONTERMINAL!";
+
+    struct huff_node *huff_rootptr;
+    huff_rootptr = malloc(sizeof(struct huff_node));
+    strcpy(huff_rootptr->word, insertword);
+    huff_root->left = huff_rootptr;
+
+
+    huff_root->right = malloc(sizeof(struct huff_node));
+    huff_root = huff_root->right;
+    strcpy(huff_root->word, nonterminal);
+
+}
+
+
 
 void inorder(struct Node *ptr, int cnt){
     
     if (ptr != NULL){
+        printf("inorder");
+        fflush(stdout);
+        printf("%d | level %d\n", ptr->val, cnt); 
+        insert_huff(ptr->word, cnt);
 
         if (ptr->heap_left != NULL){inorder(ptr->heap_left, cnt+1);}
-        printf("%d | level %d\n", ptr->val, cnt);
         if (ptr->heap_right != NULL){inorder(ptr->heap_right, cnt+1);}
 
     }
-    
 }
 
-void huff_inorder(struct Node *ptr, int cnt){
+
+void huff_inorder(struct huff_node *ptr, int cnt){
     if (ptr != NULL){
-        
-        if (ptr->heap_left != NULL){inorder(ptr->huff_left, cnt+1);}
-        printf("%d | level %d\n", ptr->val, cnt);
-        if (ptr->heap_right != NULL){inorder(ptr->huff_right, cnt+1);}
-    
+        printf("\n%s | level %d\n", ptr->word, cnt);
+        if (ptr->left != NULL){huff_inorder(ptr->left, cnt+1);}
+
+        if (ptr->right != NULL){huff_inorder(ptr->right, cnt+1);}
+
     }
-    
 }
 
-int main() {
+
+int main(){
     Init();
-
-    for(int i = 0; i < 10; i++){
-        printf("Insert %d",i);
-        insert(i);
+    int i = 0;
+    char word[50];
+    for(i=0; i < 10; i++){
+	insert(i, word);
     }
 
-    for(int i = 0; i <= 9; i++){
-        printf("Capacity %d, Level %d, pos %d\n", capacity, nextAvailableLevel, nextAvailableLeaf);
-        fflush(stdout);
-        pop();
-    }
-    
-    
-    
+    Init_huff();
+
     inorder(root, 1);
+
+    huff_inorder(original, 1);
+
+
     return 0;
 }
 
