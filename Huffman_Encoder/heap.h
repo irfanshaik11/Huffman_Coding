@@ -67,29 +67,29 @@ void Increment(){
 };
 
 void Decrement(){
+    
     if(prevFilledLevel == 0){
         printf("\nCannot Decrement Further");
     }else{
-        heapSize --;
-        nextAvailableLeaf --;
-        
-        if(nextAvailableLeaf == 0){
-            capacity = capacity - pow(2, nextAvailableLevel);
-            nextAvailableLevel--;
-            nextAvailableLeaf = pow(2,nextAvailableLevel);
-        }
+        nextAvailableLevel = prevFilledLevel;
+        nextAvailableLeaf = prevFilledLeaf;
+        heapSize--;
         
         prevFilledLeaf--;
-
-        if(prevFilledLeaf == 0){
+        if (prevFilledLeaf == 0){
             prevFilledLevel--;
-            prevFilledLeaf = pow(2,prevFilledLevel);
+            
+            if(prevFilledLevel == 0){
+                prevFilledLeaf = 1;
+            }
+            else if (prevFilledLevel == -1){
+                prevFilledLeaf = 0;
+            }else{
+                prevFilledLeaf = pow(2, prevFilledLevel);
+                
+            }
         }
-        
-        if (prevFilledLevel == -1){
-            prevFilledLevel = 0;
-        }
-        
+    
     }
 };
 
@@ -127,6 +127,7 @@ void swapNode(struct Node *n1, struct Node *n2){
     n2->huff_left = temp_node_left;
     
 }
+
 void insert(int val, char word[50]){
 //    printf("4");
     if(root == 0){
@@ -161,7 +162,7 @@ void insert(int val, char word[50]){
                 break;
             }
             
-            if(rptr->val > val){
+            if(rptr->val > newleaf->val){
                 swapNode(rptr, newleaf);
             }
             
@@ -181,54 +182,49 @@ void insert(int val, char word[50]){
     
 };
 
-void insertNode(struct Node *newNodeptr){
-    //    printf("4");
-    if(root == 0){
-        char emptyword[50];
-        root = newNodeptr;
-    }else{
-        
-        //      1
-        //   2      3
-        // 4  5   6  7
-    
-        
-
-        struct Node *rptr = root;
-        int curr_pos = nextAvailableLeaf;
-        int leaf_space = pow(2, nextAvailableLevel);
-        int curr_level = 0;
-        
-        while(1==1){
-
-            //            printf("\n%d|%d", curr_level, level);
-            if (curr_level + 1 == nextAvailableLevel){
-                if (curr_pos == 1){rptr->heap_left = newNodeptr;}
-                else{rptr->heap_right = newNodeptr;};
-                break;
-            }
+void insertNode(struct Node *newleaf){
+        if(root == 0){
+            root = newleaf;
             
-            if(rptr->val > newNodeptr->val){
-                swapNode(rptr, newNodeptr);
-            }
+        }else{
+            //      1
+            //   2      3
+            // 4  5   6  7
+            // char emptyword[50];
+            struct Node *rptr = root;
+            int curr_pos = nextAvailableLeaf;
+            int leaf_space = pow(2, nextAvailableLevel);
+            int curr_level = 0;
             
-            int mid = (int) ((float) leaf_space / 2.00);
-            if (curr_pos > mid){
-                rptr = rptr->heap_right;
-                curr_pos = curr_pos - mid;
-            }else{
-                rptr = rptr->heap_left;
+            
+            while(1==1){
+                //            printf("\n%d|%d", curr_level, level);
+                if (curr_level + 1 == nextAvailableLevel){
+                    if (curr_pos == 1){rptr->heap_left = newleaf;}
+                    else{rptr->heap_right = newleaf;};
+                    break;
+                }
+                
+                if(rptr->val > newleaf->val){
+                    swapNode(rptr, newleaf);
+                }
+                
+                int mid = (int) ((float) leaf_space / 2.00);
+                if (curr_pos > mid){
+                    rptr = rptr->heap_right;
+                    curr_pos = curr_pos - mid;
+                }else{
+                    rptr = rptr->heap_left;
+                }
+                leaf_space = leaf_space - mid;
+                curr_level++;
             }
-            leaf_space = leaf_space - mid;
-            curr_level++;
         }
-    }
-    
-    
-    Increment();
-    
-    
-};
+        
+        Increment();
+        
+    };
+
 
 void sift(struct Node *rptr){
     
@@ -237,7 +233,7 @@ void sift(struct Node *rptr){
     }else if(rptr->heap_right==NULL){
         
         if(rptr->heap_left->val < rptr->val){
-            printf("Case 6.1");
+//            printf("Case 6.1");
             fflush(stdout);
             swapNode(rptr->heap_left, rptr);
             sift(rptr->heap_left);
@@ -246,7 +242,7 @@ void sift(struct Node *rptr){
     }else if (rptr->heap_left==NULL){
         
         if(rptr->heap_right->val < rptr->val){
-            printf("Case 6.2");
+//            printf("Case 6.2");
             fflush(stdout);
             swapNode(rptr->heap_right, rptr);
             sift(rptr->heap_right);
@@ -256,12 +252,12 @@ void sift(struct Node *rptr){
     else{
         if (rptr->heap_right->val < rptr->val || rptr->heap_left->val < rptr->val){
             if (rptr->heap_right->val < rptr->heap_left->val){
-                printf("Case 6.3");
+//                printf("Case 6.3");
                 fflush(stdout);
                 swapNode(rptr, rptr->heap_right);
                 sift(rptr->heap_right);
             }else{
-                printf("Case 6.4");
+//                printf("Case 6.4");
                 fflush(stdout);
                 
                 swapNode(rptr, rptr->heap_left);
@@ -272,77 +268,77 @@ void sift(struct Node *rptr){
     
 };
 
-void heapify(struct Node *rptr){
-    struct Node *original = rptr;
-    int target_level = nextAvailableLevel-1;
-    
-    for (target_level; target_level >= 0; target_level--){
-    	  int curr_pos = pow(2, target_level);
-        for (curr_pos; curr_pos > 0; curr_pos--){
-            int curr_level = 0;
-            int leaf_space = pow(2,target_level);
-            rptr = original;
-
-
-            while(rptr != NULL){
-                if(curr_level == target_level){
-                    break;
-                }
-
-                int mid = (int) ( (float) leaf_space / 2.00);
-
-                if(curr_pos > mid){
-
-                    rptr = rptr->heap_right;
-                    curr_pos = curr_pos - mid;
-                }else{
-                    rptr = rptr->heap_left;
-                }
-                leaf_space = leaf_space - mid;
-                curr_level++;
-            }
-
-            if(rptr->heap_right==NULL && rptr->heap_left == NULL){
-                //pass
-            }else if(rptr->heap_right==NULL){
-                if(rptr->heap_left->val < rptr->val){
-
-                    printf("case 2");
-                    fflush(stdout);
-                    swapNode(rptr->heap_left, rptr);
-                    sift(rptr->heap_left);
-                }
-
-            }else if (rptr->heap_left==NULL){
-                if(rptr->heap_right->val < rptr->val){
-                    printf("case 3");
-                    fflush(stdout);
-                    swapNode(rptr->heap_right, rptr);
-                    sift(rptr->heap_right);
-                }
-
-            }
-            else{
-                if (rptr->heap_right->val < rptr->val || rptr->heap_left->val < rptr->val){
-                    if (rptr->heap_right->val < rptr->heap_left->val){
-                        printf("case 4.56");
-                        fflush(stdout);
-                        swapNode(rptr, rptr->heap_right);
-                        sift(rptr->heap_right);
-                    }else{
-                        printf("case 4.75");
-                        fflush(stdout);
-                        swapNode(rptr, rptr->heap_left);
-                        sift(rptr->heap_left);
-                    }
-                }
-            }
-
-        }
-    }
-
-    printf("heapify quit");
-};
+//void heapify(struct Node *rptr){
+//    struct Node *original = rptr;
+//    int target_level = nextAvailableLevel-1;
+//
+//    for (target_level; target_level >= 0; target_level--){
+//          int curr_pos = pow(2, target_level);
+//        for (curr_pos; curr_pos > 0; curr_pos--){
+//            int curr_level = 0;
+//            int leaf_space = pow(2,target_level);
+//            rptr = original;
+//
+//
+//            while(rptr != NULL){
+//                if(curr_level == target_level){
+//                    break;
+//                }
+//
+//                int mid = (int) ( (float) leaf_space / 2.00);
+//
+//                if(curr_pos > mid){
+//
+//                    rptr = rptr->heap_right;
+//                    curr_pos = curr_pos - mid;
+//                }else{
+//                    rptr = rptr->heap_left;
+//                }
+//                leaf_space = leaf_space - mid;
+//                curr_level++;
+//            }
+//
+//            if(rptr->heap_right==NULL && rptr->heap_left == NULL){
+//                //pass
+//            }else if(rptr->heap_right==NULL){
+//                if(rptr->heap_left->val < rptr->val){
+//
+////                    printf("case 2");
+//                    fflush(stdout);
+//                    swapNode(rptr->heap_left, rptr);
+//                    sift(rptr->heap_left);
+//                }
+//
+//            }else if (rptr->heap_left==NULL){
+//                if(rptr->heap_right->val < rptr->val){
+////                    printf("case 3");
+//                    fflush(stdout);
+//                    swapNode(rptr->heap_right, rptr);
+//                    sift(rptr->heap_right);
+//                }
+//
+//            }
+//            else{
+//                if (rptr->heap_right->val < rptr->val || rptr->heap_left->val < rptr->val){
+//                    if (rptr->heap_right->val < rptr->heap_left->val){
+////                        printf("case 4.56");
+//                        fflush(stdout);
+//                        swapNode(rptr, rptr->heap_right);
+//                        sift(rptr->heap_right);
+//                    }else{
+////                        printf("case 4.75");
+//                        fflush(stdout);
+//                        swapNode(rptr, rptr->heap_left);
+//                        sift(rptr->heap_left);
+//                    }
+//                }
+//            }
+//
+//        }
+//    }
+//
+////    printf("heapify quit");
+//};
 //
 struct Node *pop(){
     if (capacity == 0){
@@ -366,15 +362,16 @@ struct Node *pop(){
     int curr_level = 0;
     int leaf_space = pow(2, prevFilledLevel);
     int curr_pos = prevFilledLeaf;
-
+//    printf("\nPop from level %d, pos %d\n", target_level, curr_pos);
     struct Node *rptr = root;
     struct Node *returnNode = NULL;
 //    printf("pop %d", curr_pos);
+    
     while (rptr != NULL){
-
+//        printf("\n Curr Level: %d, Curr Pos: %d\n", curr_level, curr_pos);
         if (curr_level + 1 == target_level){
             if (curr_pos == 1){
-                if (rptr->heap_left != NULL){
+                if (rptr->heap_left == NULL){
                     printf("heap_left is NULL");
                     fflush(stdout);
                     break;
@@ -405,6 +402,7 @@ struct Node *pop(){
         leaf_space = leaf_space - mid;
         curr_level++;
     }
+    
     sift(root);
     Decrement();
     return returnNode;
