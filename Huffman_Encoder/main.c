@@ -21,7 +21,6 @@ struct huff_node{
     struct huff_node *left, *right;
 };
 
-
 struct huff_node *huff_root = NULL;
 struct huff_node *original = NULL;
 
@@ -34,55 +33,57 @@ void buildHuffmanTreeFromCode(char word[50], int freq, char code[100]){
     }
     
     struct huff_node *myroot = huff_root;
-    printf("%s", word);
+//    printf("%s", word);
     fflush(stdout);
     
     int i = 0;
     int j = 0;
     for(i=0; i < 99; i++){
-        printf("%c \n", code[i]);
+//        printf("%c \n", code[i]);
         if (code[i+1] == '\0'){
             j = i;
             break;
         }
         
         if (code[i] == '0'){
-            printf("Did not make it here \n");
+//            printf("Did not make it here \n");
             //printf("ROOT %ld\n", myroot);
             if(myroot->left == NULL){
-                printf("here 1\n");
+//                printf("here 1\n");
                 fflush(stdout);
                 myroot->left = malloc(sizeof(struct huff_node));
                 myroot = myroot->left;
                 myroot->left = NULL;
                 myroot->right = NULL;
-                printf("here 1 close\n");
-                printf("here 2\n");
+//                printf("here 1 close\n");
+//                printf("here 2\n");
                 strcpy(myroot->word, nonterminal);
 
-                printf("here 2 close\n");
+//                printf("here 2 close\n");
             }else{
-                printf("here 3\n");
+//                printf("here 3\n");
                 myroot = myroot->left;
-                printf("here 3 close\n");}
+//                printf("here 3 close\n");
+                
+            }
             
             
         }else{
             if(myroot->right == NULL){
-                printf("here 4\n");
+//                printf("here 4\n");
                 myroot->left = malloc(sizeof(struct huff_node));
                 myroot = myroot->left;
                 myroot->left = NULL;
                 myroot->right = NULL;
 
-                printf("here4 close\n");
-                printf("here 5 open\n");
+//                printf("here4 close\n");
+//                printf("here 5 open\n");
                 strcpy(myroot->word, nonterminal);
-                printf("here 5 close\n");
+//                printf("here 5 close\n");
             }else{
-                printf("here 6\n");
+//                printf("here 6\n");
                 myroot = myroot->right;
-                printf("here 6 close\n");
+//                printf("here 6 close\n");
             }
         }
     }
@@ -107,38 +108,58 @@ void buildHuffmanTreeFromCode(char word[50], int freq, char code[100]){
 
 
 int decode_and_write(char *word, char filename[100], FILE **file_ptr){
+
     printf("have entered decode and write \n");
-    char outfile[100];
-    strcpy(outfile,filename);
-    strcat(outfile, ".hcz");
+
     struct huff_node *myroot;
     myroot = huff_root;
-    printf("have reached huff_root");
-    for (word = word; *word != '\0'; word++){
-        if (*word == '0'){
+    printf("have reached huff_root: %p %s %s\n", myroot, myroot->word, word);
+    
+    for(char *inputPtr = word; *inputPtr; ++inputPtr){
+        printf("*inputPtr is %c, (%d)\n", *inputPtr, *inputPtr);
+        if (*inputPtr == '0'){
+            printf("myroot is %p \n", myroot);
             if(myroot->left == NULL){
-                printf("Could not decode %s", word);
+                printf("DAW: Could not decode %s\n", word);
                 return -1;
             }
             myroot = myroot->left;
-        }else{
+        }else if (*inputPtr == '1'){
+            printf("myroot right is %p \n", myroot);
             if(myroot->right == NULL){
-                printf("Could not decode %s", word);
+                printf("DAW: Could not decode %s\n", word);
                 return -1;
             }
             myroot = myroot->right;
+        }else{
+            printf("unrecognized char: %c (%d)\n", *inputPtr);
         }
     }
     
-    
-    
-//    FILE *file_ptr;
-//    file_ptr = fopen(outfile, "r+");
-    
-    fprintf(*file_ptr, "%s ", myroot->word);
-    
-//    fclose(file_ptr);
+    printf("DAW: writing %s to %s\n", myroot->word, filename);
+    fprintf(*file_ptr, "%s", myroot->word);
+
     return 0;
+    
+//    for (word = word; word <strlen(word); word++){
+//        if (strcmp(word,'0')==0){
+//            if(myroot->left == NULL){
+//                printf("Could not decode %s", word);
+//                return -1;
+//            }
+//            myroot = myroot->left;
+//        }else{
+//            if(myroot->right == NULL){
+//                printf("Could not decode %s", word);
+//                return -1;
+//            }
+//            myroot = myroot->right;
+//        }
+//    }
+//    printf("writing %s to %s\n",myroot->word, filename);
+//    fprintf(*file_ptr, "%s ", myroot->word);
+//
+//    return 0;
 }
 
 // PART OF HASH FUNCTION buildLookupTreeFromCode
@@ -169,10 +190,9 @@ int buildLookupTreeFromCode(char *word, int freq, char *code){
         strcpy(word2code[key]->code, code);
         return 1;
     }
-//    printf("2\n");
+
     myroot = word2code[key];
     
-//    printf("3\n");
     while (myroot != NULL){
 //        printf("3 w\n");
 //        printf("myword->word %p word %p\n", myroot->word, word);
@@ -269,7 +289,7 @@ int encodeFile(char *filename){
     strcpy(outfile, filename);
     strcat(outfile, ".hcz");
     
-    FILE *encodeFilePtr = fopen(outfile, "w");
+    FILE *encodeFilePtr = fopen(outfile, "wb");
     
     while(fgets(buf,1000, ptr_file2)!=NULL){
         //            printf("\n Exec1kjljkl;j");
@@ -289,49 +309,56 @@ int encodeFile(char *filename){
     
     //        printf("\ndone opening file to be encoded");
     fflush(stdout);
+    return 0;
 }
 
 int buildCodebook(char *filename){
+    printf("\n      CREATING HUFFMANCODEBOOK FILE\n");
+    printf("\n      Frequency | Word | Huffman Code");
     
-    printf("build Codebook\n");
+//    printf("build Codebook\n");
     char nonterminal[50] = "!NONTERMINAL!";
     Init();
     int i = 0;
     char word[50];
-    printf("here\n");
-    FILE *ptr_file;
     
-    printf("\nPassing %s to wordfreq\n", filename);
-    fflush(stdout);
+//    printf("\nPassing %s to wordfreq\n", filename);
     
     wordfreq(filename);
-    fflush(stdout);
     
     struct Node *origin;
     origin = malloc(sizeof(struct Node));
     
     while(1==1){
-        if(heapSize > 2){
+        if(heapSize >= 2){
+//            printf("fails node1\n");
             struct Node *node1 = pop();
+//            printf("fails node2\n");
             struct Node *node2 = pop();
+//            printf("fails after node2\n");
             struct Node *combinedNode;
             combinedNode = malloc(sizeof(struct Node));
             combinedNode->huff_right = node1;
             combinedNode->huff_left = node2;
+            if(node2 == NULL && node1 == NULL){printf("Both nodes are null error");return -1;}
+            if(node2 == NULL){origin = node1; break;}
+//            printf("node1 %p, node2 %p \n", node1, node2);
             combinedNode->val = node1->val + node2->val;
             strcpy(combinedNode->word, nonterminal);
-            
+//            printf("fails on insertNode\n");
             insertNode(combinedNode);
-            
-        }else if(heapSize == 2){
-            origin = pop();
-            break;
+//            printf("fails after insertNode\n");
+//            printf("heap size is %d\n", heapSize);
+//        }else if(heapSize == 2){
+//            origin = pop();
+//            break;
         }else if (heapSize == 1){
             origin = pop();
             break;
         }
         else{
             printf("\nERROR: Heap is Empty\n");
+            printf("heap size is %d\n", heapSize);
             break;
         }
     }
@@ -339,11 +366,13 @@ int buildCodebook(char *filename){
     FILE *fptr;
     fptr = fopen("HuffmanCodebook", "w");
     fprintf(fptr,"Word | Frequency | Code\n");
-    
     fclose(fptr);
     
     printLevelOrder(origin);
     
+    
+    printf("\n\n      FILE HUFFMANCODEBOOK HAS BEEN CREATED\n\n");
+
     return 0;
 }
 
@@ -395,7 +424,7 @@ int encode_and_write(char *word, char *filename, FILE **file_ptr){
 
 int decodeFile(char *filename){
     // BUILD HUFFMAN TREE
-    printf("Decode File\n");
+//    printf("Decode File\n");
     char nonterminal[50] = "!NONTERMINAL!";
     Init();
     int i = 0;
@@ -411,7 +440,7 @@ int decodeFile(char *filename){
     int curr_freq;
     char curr_code[100];
     
-    printf("We have reached while loop");
+//    printf("We   while loop");
     //BUILD A LOOKUP TREE TO FIND THE WORD GIVEN A CODE
     while (fgets(buf,1000, ptr_file)!=NULL){
         if (linenum != 1){
@@ -429,31 +458,50 @@ int decodeFile(char *filename){
                 ptr = strtok(NULL, delim);
                 cntr++;
             }
-        
-            buildLookupTreeFromCode(word, curr_freq, curr_code);
+            buildHuffmanTreeFromCode(word, curr_freq, curr_code);
         }
         linenum++;
     }
     fclose(ptr_file);
     //DECODE BASED ON HUFFMAN TREE
-    printf("Have reached file pointer\n");
+//    printf("Have reached file pointer\n");
     FILE *file_ptr2;
     char buf2[1000];
-    printf("opening filename: %s\n", filename);
+    char outfile[100];
+    strcpy(outfile, filename);
+
+    int eof = strlen(outfile);
+    // Removing .hcz to output filepath
+    for(i=eof-4; i < eof; i++){
+        printf("outfile[%d]: %c\n", i, outfile[i]);
+        outfile[i] = '\0';
+    }
+//    for(i=0; i < eof; i++){
+//        printf("outfile[%d]: %c\n", i, outfile[i]);
+////        outfile[i] = '\0';
+//    }
+
+    printf("reading file: %s\n", filename);
+    printf("writing to file: %s\n", outfile);
     file_ptr2 = fopen(filename, "r");
+    FILE *file_to_write_ptr;
+    file_to_write_ptr = fopen(outfile,"w");
     printf("attempting to open file\n");
     while (fgets(buf2, 1000, file_ptr2)!= NULL){
-        printf("made it to while loop\n");
-        char *ptr = strtok(buf, delim);
-        fflush(stdout);
-        int cntr = 1;
-        while(ptr!=NULL){
-            
-            decode_and_write(ptr, filename, &file_ptr2);
-            printf("have passed decode and write \n");
-            ptr = strtok(NULL, delim);
-            cntr++;
-        }
+//        printf("made it to while loop\n");
+        
+//        char *ptr = strtok(buf, delim2);
+        
+//        int cntr = 1;
+//        while(ptr!=NULL){
+        buf2[strcspn(buf2, "\n")] = '\0';
+
+        printf("1. writing %s to %s\n", buf2, outfile);
+        decode_and_write(buf2, outfile, &file_to_write_ptr);
+//            printf("have passed decode and write \n");
+//            ptr = strtok(NULL, delim2);
+//            cntr++;
+//        }
         //fclose(ptr);
     }
     printf("closing file");
@@ -493,9 +541,6 @@ int main(int argc, char **argv){
         if(strcmp(argv[i],"-b")==0){bflag = 1;};if(strcmp(argv[i],"-R")==0){Rflag = 1;};
         if(strcmp(argv[i], "-c")==0){cflag = 1;};if(strcmp(argv[i], "-d")==0){dflag = 1;};}
     
-    
-    
-    
    // THIS CODE RUNS WHEN R FLAG AND ANOTHER FLAG ARE BOTH UP
     if (Rflag == 1){
         init_listdir();
@@ -514,6 +559,7 @@ int main(int argc, char **argv){
             
             return encodeFile(argv[argc-2]);
         }else if(bflag == 1){
+            
             if(checkFilepath(argv[argc-1])!=0){
             printf("\n      Filepath in Last Argument is Incorrect");
                 printf("\n      Proper Usage is ./fileCompressor <flag> <path or file> |codebook|");
@@ -557,7 +603,7 @@ int main(int argc, char **argv){
             printf("\n      Proper Usage is ./fileCompressor <flag> <path or file> |codebook|\n");
             return -1;}
         
-        encodeFile(argv[argc-1]);
+        encodeFile(argv[argc-2]);
     }else{
         printf("\n      No flags given or only R flag given");
         printf("\n      Proper Usage is ./fileCompressor <flag> <path or file> |codebook|\n");

@@ -15,7 +15,7 @@ void printToCodebook(char word[50], int freq, char curr_code[50]){
     
     sprintf(line, "%s | %d | %s\n", word, freq, curr_code);
     
-    fptr = fopen("HuffmanCodebook", "r+");
+    fptr = fopen("HuffmanCodebook", "a");
     
     if(fptr == NULL)
     {
@@ -78,8 +78,8 @@ void printGivenLevel(struct Node* root, int level, char curr_code[50])
     
     if (level == 1){
         
-        if(strcmp(root->word, "!NONTERMINAL!")!=0){
-            printf("\nFreq: %d | Word: %s| curr_code: %s\n", root->val, root->word, curr_code);
+        if(strcmp(root->word, "!NONTERMINAL!")!=0 && strcmp(root->word, "")!=0){
+            printf("\n      %d %s %s", root->val, root->word, curr_code);
             printToCodebook(root->word, root->val, curr_code);}
     }
     else if (level > 1)
@@ -103,6 +103,8 @@ void printLevelOrder(struct Node* root)
     int h = height(root);
     int i;
     char null_code[50] = "";
+
+
     for (i=1; i<=h; i++)
         printGivenLevel(root, i, null_code);
 }
@@ -111,7 +113,7 @@ void printLevelOrder(struct Node* root)
 int wordfreq(char filename[100]) {
     filename = strtok(filename, "\n");
     
-    printf("filename %s", filename);
+//    printf("filename %s", filename);
     fflush(stdout);
     word words[MAXWORDS];
     int i,n, m;
@@ -124,17 +126,17 @@ int wordfreq(char filename[100]) {
     char *buf = malloc(50*sizeof(char));
     
     while( fscanf(fp, "%s", buf) != EOF ){
-        printf("\n%s", buf);
+//        printf("\n%s cnt %d", buf, n);
         insert_word(words,&n, buf);
     }
     
     qsort((void *) words, n, sizeof (word),
           (int (*) (const void *, const void *)) wordcmp);
     
-    printf("n is %d", n);fflush(stdout);
+//    printf("n is %d", n);fflush(stdout);
     
     for (i=0; i<=n; i++){
-        printf("%s %d\n", words[i].s, words[i].count);
+//        printf("%s %d\n", words[i].s, words[i].count);
         insert(words[i].count, words[i].s);
     }
     

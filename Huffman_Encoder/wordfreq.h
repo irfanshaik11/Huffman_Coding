@@ -27,9 +27,9 @@ int insert_word (word *words,int *n, char *s) {
     int i;
 
     /* linear search for the word */
-    printf("Inserting word: %s", s);
+//    printf("Inserting word: %s", s);
     
-    printf("n is %d", *n);fflush(stdout);
+//    printf("n is %d", *n);fflush(stdout);
     
     for (i=0; i<=*n; i++) if (strcmp (s, words[i].s) == 0) {
 
