@@ -1,6 +1,0 @@
-./untitled/.DS_Store
-./untitled/mysamplecopy.txt.hcz
-./untitled/mysample.txt.hcz
-./untitled/.DS_Store.hcz
-./untitled/.DS_Store.hcz.hcz.hcz
-./untitled/.DS_Store.hcz.hcz
