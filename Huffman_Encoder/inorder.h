@@ -29,12 +29,12 @@ void printToCodebook(char word[50], int freq, char curr_code[50]){
 }
 
 // INODER TRAVERSAL  TO BUILD CODEBOOK
-void huff_inorder(struct Node *ptr, int cnt, char curr_code[50]){
+void huff_inorder(struct Node *ptr, int cnt, char curr_code[100]){
     
     if (ptr != NULL){
         printf("\nword %s| freq %d | level %d\n", ptr->word,ptr->val, cnt);
         
-        char temp_code1[50], temp_code2[50];
+        char temp_code1[100], temp_code2[100];
         strcpy(temp_code1, curr_code);
         strcpy(temp_code2, curr_code);
         
@@ -71,7 +71,7 @@ int height(struct Node* node)
 }
 
 // PART OF INORDER TRAVERSAL
-void printGivenLevel(struct Node* root, int level, char curr_code[50])
+void printGivenLevel(struct Node* root, int level, char curr_code[100])
 {
     if (root == NULL)
         return;
@@ -80,12 +80,16 @@ void printGivenLevel(struct Node* root, int level, char curr_code[50])
         
         if(strcmp(root->word, "!NONTERMINAL!")!=0 && strcmp(root->word, "")!=0){
             printf("\n      %d %s %s", root->val, root->word, curr_code);
-            printToCodebook(root->word, root->val, curr_code);}
+            printToCodebook(root->word, root->val, curr_code);
+        }else{
+            printf("\n      %d %s %s", root->val, root->word, curr_code);
+        }
+        
     }
     else if (level > 1)
     {
         
-        char temp1[50], temp2[50];
+        char temp1[100], temp2[100];
         
         strcpy(temp1, curr_code);
         strcpy(temp2, curr_code);
@@ -102,7 +106,7 @@ void printLevelOrder(struct Node* root)
 {
     int h = height(root);
     int i;
-    char null_code[50] = "";
+    char null_code[100] = "";
 
 
     for (i=1; i<=h; i++)
@@ -123,7 +127,7 @@ int wordfreq(char filename[100]) {
     
     FILE *fp = fopen(filename,"r");
     
-    char *buf = malloc(50*sizeof(char));
+    char *buf = malloc(100*sizeof(char));
     
     while( fscanf(fp, "%s", buf) != EOF ){
 //        printf("\n%s cnt %d", buf, n);

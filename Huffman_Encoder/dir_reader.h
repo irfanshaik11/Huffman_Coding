@@ -50,7 +50,7 @@ void listdirRecursively(const char *name, int indent)
             char path[1024];
             if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
                 continue;
-            snprintf(path, sizeof(path), "%s/%s", name, entry->d_name);
+            snprintf(path, sizeof(path), "%s%s", name, entry->d_name);
 //            printf("%*s[%s]\n", indent, "", entry->d_name);
 //            listdir(path, indent + 2);
             listdirRecursively(path, indent);
@@ -59,18 +59,30 @@ void listdirRecursively(const char *name, int indent)
 //            printf("%s/%s\n", name, entry->d_name);
             FILE *fptr;
             fptr = fopen("dir_reader_filepaths.txt","a");
+            
             if(fptr!= NULL){
-                if (strcmp(name, "./") == 0){
-                    fprintf(fptr, "%s/%s\n", name,entry->d_name);
-                }
-                else{
-                    fprintf(fptr, "%s/%s\n", name,entry->d_name);
+                char actual_out[1024];
+                char temp_out[1024];
+                
+                strcpy(temp_out, name);
+                strcat(temp_out, "/");
+                strcat(temp_out, entry->d_name);
+                strcat(temp_out, "\n");
+                int j = 0;
+                for(int i = 0; i < 1024-1; i++){
+                    if (temp_out[i] == '/' && temp_out[i+1] == '/'){
+                        //pass
+                    }else{
+                        actual_out[j] = temp_out[i];
+                        j++;
+                    }
                 }
                 
                 
+                fprintf(fptr, "%s", actual_out);
             }
                 fclose(fptr);
-            }
+        }
 //            printfilepath(name, entry->d_name);
             
         }

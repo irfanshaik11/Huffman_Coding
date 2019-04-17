@@ -355,7 +355,6 @@ struct Node *pop(){
         struct Node * temp = root;
         root = NULL;
         return temp;
-        
     }
     
     int target_level = prevFilledLevel;
@@ -389,7 +388,6 @@ struct Node *pop(){
 
                 break;
             };
-
         }
 
         int mid = (int) ((float) leaf_space / 2.00);
